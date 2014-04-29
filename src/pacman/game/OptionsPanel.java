@@ -104,7 +104,6 @@ public class OptionsPanel extends JPanel {
         labelSelectControlMode.setText("Хотите сами управлять Пакманом?");
 
         radioModeManual.setText("да, я буду давать указания мышью");
-        radioModeManual.setSelected(true);
         radioModeManual.addActionListener(new ActionListener() {
             //<editor-fold defaultstate="collapsed" desc="actionPerformed">
             @Override
@@ -115,6 +114,7 @@ public class OptionsPanel extends JPanel {
         });
 
         radioModeMinimax.setText("нет, пусть Пакман всё решает сам и много думает");
+        radioModeMinimax.setSelected(true);
         radioModeMinimax.addActionListener(new ActionListener() {
             //<editor-fold defaultstate="collapsed" desc="actionPerformed">
             @Override
@@ -134,7 +134,7 @@ public class OptionsPanel extends JPanel {
             //</editor-fold>
         });
 
-        labelSelectGhostsNumber.setText("Количество преследующих призраков:");
+        labelSelectGhostsNumber.setText("Количество преследующих привидений:");
         
         comboGhostsNumber.setModel(new DefaultComboBoxModel(ghostNumberOptions));
         comboGhostsNumber.setMaximumSize(new Dimension(50, 25));

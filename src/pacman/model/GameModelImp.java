@@ -59,7 +59,7 @@ public class GameModelImp extends TurnDrivenGameModel {
                 Thread t = new Thread(r, "ghost computation");
                 return t;
             }});
-        animationThreadService = Executors.newFixedThreadPool(totalGhosts+1, new ThreadFactory() {
+        animationThreadService = Executors.newCachedThreadPool(new ThreadFactory() {
             @Override
             public Thread newThread(Runnable r) {
                 Thread t = new Thread(r, "player animator");
@@ -121,7 +121,7 @@ public class GameModelImp extends TurnDrivenGameModel {
         
         @Override
         public void redrawGraphics() {
-            reportChanged();
+            redrawView();
         }
         //</editor-fold>
     }

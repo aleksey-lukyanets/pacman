@@ -91,10 +91,21 @@ public class Minimax<T> implements ISearchAlgorithm<T, IExtendedState<T>> {
         actionsTree.clear();
 
         float value = getValue(state, 0, -1, alpha, beta);               // Запуск алгоритма поиска оптимального (для уровня 0) действия с возвратом его цены
-        T action = actionsTree.get(value);
         
         //System.out.println("---------------------------------------------------------");
+        //System.out.println(actionsTree.values());
+        //System.out.println(actionsTree.keySet());
+        
+        // Если среди возможных действий нет действия с возвращённым поиском значением,
+        // значит смерть максимизирующего агента неизбежна
+        if (!actionsTree.containsKey(value)) {
+            //System.out.println("всё кончено");
+            return actionsTree.values().iterator().next();              // Выбрать первое попавшееся действие
+        }
+        
+        T action = actionsTree.get(value);
         //System.out.println("    Оптимальное действие: " + action + " с оценкой " + value);
+        
         //System.out.println("");
         //System.out.println("");
         //System.out.println("");

@@ -41,18 +41,29 @@ import pacman.view.players.PacmanFigure;
  */
 public class GameView extends JPanel implements Observer {
 
-    private final IAnimatedGameModel myModel;
-    private final int mazeCellSize;
-    private final TreeMap<PlayerType, AbstractPlayerFigure> playersView = new TreeMap<PlayerType, AbstractPlayerFigure>();
-    private final Map<CellContent, IDrawableContent> cellsView = new LinkedHashMap<CellContent, IDrawableContent>();
+    private IAnimatedGameModel myModel;
+    private int mazeCellSize;
+    private final TreeMap<PlayerType, AbstractPlayerFigure> playersView = new TreeMap<>();
+    private final Map<CellContent, IDrawableContent> cellsView = new LinkedHashMap<>();
     private GameController myController;
 
     /**
      * Создаёт новое графическое представление игры.
-     * 
+     */
+    public GameView() {
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                myController.handleMouseClick(e);
+            }
+        });
+    }
+
+    /**
+     *
      * @param model модель игры
      */
-    public GameView(IAnimatedGameModel model) {
+    public void setModel(IAnimatedGameModel model) {
         myModel = model;
         mazeCellSize = myModel.getMazeCellSize();
         
@@ -68,13 +79,6 @@ public class GameView extends JPanel implements Observer {
         cellsView.put(CellContent.WALL, new Wall(mazeCellSize / 8));
         cellsView.put(CellContent.FOOD, new Food(mazeCellSize / 5));
         cellsView.put(CellContent.PILLET, new Food(mazeCellSize / 2));
-        
-        addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                myController.handleMouseClick(e);
-            }
-        });
     }
 
     /**
@@ -88,7 +92,9 @@ public class GameView extends JPanel implements Observer {
 
     @Override
     public void update(Observable o, Object arg) {
-        repaint();
+        if (myModel.isRedrawRequired()) {
+            repaint();
+        }
         if (myModel.isPacmanQueueEmpty()) {
             myController.performPacmanQueueEmpty();
         }

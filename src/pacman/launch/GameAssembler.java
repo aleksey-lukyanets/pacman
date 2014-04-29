@@ -50,7 +50,8 @@ public class GameAssembler {
         gameMap = new GameFieldMap(gameCanvasSize, cellSize, startLocations, initialWallsLocation, pilletsLocations);
         model = new GameModelImp(gameMap);
         
-        view = new GameView(model);
+        view = new GameView();
+        view.setModel(model);
         model.addObserver(view);
 
         controller = new GameController(model, view, frame, contentPane);

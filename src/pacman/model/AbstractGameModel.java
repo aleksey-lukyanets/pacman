@@ -39,6 +39,7 @@ public abstract class AbstractGameModel
     
     private final List<Point> locationsPool = new ArrayList<Point>();
     private boolean pacmanActionsDone = true;
+    private boolean redrawRequired = false;
 
     /**
      * Создаёт новую обобщённую модель игры.
@@ -62,6 +63,15 @@ public abstract class AbstractGameModel
         setChanged();
         notifyObservers();
         clearChanged();
+    }
+
+    /**
+     * Уведомляет о необходимости перерисовки вида.
+     */
+    protected void redrawView() {
+        redrawRequired = true;
+        reportChanged();
+        redrawRequired = false;
     }
 
     /**
@@ -91,7 +101,7 @@ public abstract class AbstractGameModel
     public void reinitializeGame() {
         int pacmanId = reinitializePlayers();
         myMaze = new Maze(gameFieldMap, locationsPool, true);
-        gameState = new GameState<IAction>(myMaze, totalGhosts, gameFieldMap.getStartLocations(), pacmanId, myMaze.getFood(), myMaze.getPillets(), getPossibleActions());
+        gameState = new GameState<>(myMaze, totalGhosts, gameFieldMap.getStartLocations(), pacmanId, myMaze.getFood(), myMaze.getPillets(), getPossibleActions());
         setPacmanActionsDone();
     }
 
@@ -108,6 +118,11 @@ public abstract class AbstractGameModel
     @Override
     public Point getCellAddress(Point coordinate) {
         return new Point(coordinate.x / getMazeCellSize(), coordinate.y / getMazeCellSize());
+    }
+    
+    @Override
+    public boolean isPacmanQueueEmpty() {
+        return pacmanActionsDone;
     }
     
     //------------------------------------ Реализация интерфейса IAnimatedGameModel
@@ -151,9 +166,12 @@ public abstract class AbstractGameModel
     public List<IAction[]> getCorners() {
         return NonstopAction.getCorners();
     }
-    
+
+    /**
+     * @return the redrawRequired
+     */
     @Override
-    public boolean isPacmanQueueEmpty() {
-        return pacmanActionsDone;
+    public boolean isRedrawRequired() {
+        return redrawRequired;
     }
 }

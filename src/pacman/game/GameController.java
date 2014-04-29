@@ -50,8 +50,8 @@ public class GameController {
         myFrame = frame;
 
         optionsPanel = new OptionsPanel(this);
-        pacmanControlMode = PacmanMode.MANUAL;
-        pacmanBfs = new BreadthFirstSearch<IAction>();
+        pacmanControlMode = PacmanMode.AUTO_THINK_MUCH;
+        pacmanBfs = new BreadthFirstSearch<>();
         modelThreadService
                 = Executors.newSingleThreadExecutor(new ThreadFactory() {
             @Override

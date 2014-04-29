@@ -37,13 +37,13 @@ public enum NonstopAction implements IAction {
         this.basis = new Point(dx, dy);
     }
 
-    private static final List<IAction> values = new ArrayList<IAction>();
-    private static final List<IAction[]> corners = new ArrayList<IAction[]>(Arrays.asList(
+    private static final List<IAction> values = new ArrayList<>();
+    private static final List<IAction[]> corners = new ArrayList<>(Arrays.asList(
                 new IAction[]{EASTWARD, SOUTHWARD},
                 new IAction[]{EASTWARD, NORTHWARD},
                 new IAction[]{WESTWARD, SOUTHWARD},
                 new IAction[]{WESTWARD, NORTHWARD}));
-    private static List<Point> loctionsPool = new ArrayList<Point>();
+    private static List<Point> loctionsPool = new ArrayList<>();
     
     static {
         values.add(NORTHWARD);
@@ -102,7 +102,7 @@ public enum NonstopAction implements IAction {
     public static Point getLocationAfterSequence(Point start, Queue<IAction> sequence) {
         Point location = start;
         if (sequence.isEmpty() == false) {
-            Queue<IAction> queue = new LinkedList<IAction>(sequence);
+            Queue<IAction> queue = new LinkedList<>(sequence);
             while (queue.isEmpty() == false) {
                 IAction action = queue.remove();
                 location = action.getLocationAfterAction(location);

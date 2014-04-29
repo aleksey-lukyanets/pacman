@@ -75,4 +75,11 @@ public interface IAnimatedGameModel {
      * @return <code>true</code>, если Пакманом выполнил все свои действия
      */
     public boolean isPacmanQueueEmpty();
+    
+    /**
+     * Возвращает <code>true</code>, если есть необходимость перерисовки вида.
+     * 
+     * @return <code>true</code>, если есть необходимость перерисовки вида.
+     */
+    public boolean isRedrawRequired();
 }

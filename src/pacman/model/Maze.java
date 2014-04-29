@@ -206,7 +206,7 @@ public class Maze implements IGameField {
      */
     public void refreshFood(Collection<Point> freshFoodList) {
         if (!freshFoodList.isEmpty()) {
-            Set<Point> difference = new HashSet<Point>(foodLocation);
+            Set<Point> difference = new HashSet<>(foodLocation);
             difference.removeAll(freshFoodList);
             for (Point location : difference) {
                 mazeCells.get(location).removeFood();
@@ -227,7 +227,7 @@ public class Maze implements IGameField {
      */
     public void refreshPillets(Collection<Point> freshPilletsList) {
         if (!freshPilletsList.isEmpty()) {
-            Set<Point> difference = new HashSet<Point>(pilletsLocation);
+            Set<Point> difference = new HashSet<>(pilletsLocation);
             difference.removeAll(freshPilletsList);
             for (Point location : difference) {
                 mazeCells.get(location).removePillet();
