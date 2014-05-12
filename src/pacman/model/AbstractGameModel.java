@@ -101,7 +101,7 @@ public abstract class AbstractGameModel
     public void reinitializeGame() {
         int pacmanId = reinitializePlayers();
         myMaze = new Maze(gameFieldMap, locationsPool, true);
-        gameState = new GameState<>(myMaze, totalGhosts, gameFieldMap.getStartLocations(), pacmanId, myMaze.getFood(), myMaze.getPillets(), getPossibleActions());
+        gameState = new GameState<IAction>(myMaze, totalGhosts, gameFieldMap.getStartLocations(), pacmanId, myMaze.getFood(), myMaze.getPillets(), getPossibleActions());
         setPacmanActionsDone();
     }
 

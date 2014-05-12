@@ -63,7 +63,7 @@ public class DatabaseFieldMap extends FieldMap {
         preparedStatement.setInt(1, mapId);
         ResultSet result = preparedStatement.executeQuery();
         
-        List<Point> starts = new ArrayList<>();
+        List<Point> starts = new ArrayList<Point>();
         while (result.next()) {
             starts.add(result.getInt("player_index"), new Point(result.getInt("cell_x"), result.getInt("cell_y")));
         }
@@ -78,7 +78,7 @@ public class DatabaseFieldMap extends FieldMap {
         preparedStatement.setInt(1, mapId);
         ResultSet result = preparedStatement.executeQuery();
         
-        Set<Point> walls = new HashSet<>();
+        Set<Point> walls = new HashSet<Point>();
         while (result.next()) {
             walls.add(new Point(result.getInt("cell_x"), result.getInt("cell_y")));
         }
@@ -93,7 +93,7 @@ public class DatabaseFieldMap extends FieldMap {
         preparedStatement.setInt(1, mapId);
         ResultSet result = preparedStatement.executeQuery();
         
-        Set<Point> walls = new HashSet<>();
+        Set<Point> walls = new HashSet<Point>();
         while (result.next()) {
             walls.add(new Point(result.getInt("cell_x"), result.getInt("cell_y")));
         }

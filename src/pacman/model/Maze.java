@@ -6,11 +6,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import pacman.game.IGameField;
 
 /**
@@ -18,7 +18,7 @@ import pacman.game.IGameField;
  */
 public class Maze implements IGameField {
 
-    private final Map<Point, MazeCell> mazeCells = new HashMap<Point, MazeCell>();
+    private final Map<Point, MazeCell> mazeCells = new ConcurrentHashMap<Point, MazeCell>();
     private final Set<Point> foodLocation = new HashSet<Point>();
     private final Set<Point> pilletsLocation = new HashSet<Point>();
 
@@ -206,7 +206,7 @@ public class Maze implements IGameField {
      */
     public void refreshFood(Collection<Point> freshFoodList) {
         if (!freshFoodList.isEmpty()) {
-            Set<Point> difference = new HashSet<>(foodLocation);
+            Set<Point> difference = new HashSet<Point>(foodLocation);
             difference.removeAll(freshFoodList);
             for (Point location : difference) {
                 mazeCells.get(location).removeFood();
@@ -227,7 +227,7 @@ public class Maze implements IGameField {
      */
     public void refreshPillets(Collection<Point> freshPilletsList) {
         if (!freshPilletsList.isEmpty()) {
-            Set<Point> difference = new HashSet<>(pilletsLocation);
+            Set<Point> difference = new HashSet<Point>(pilletsLocation);
             difference.removeAll(freshPilletsList);
             for (Point location : difference) {
                 mazeCells.get(location).removePillet();

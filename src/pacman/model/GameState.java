@@ -77,21 +77,21 @@ public class GameState<T extends IAction> implements IExtendedState<T> {
     public GameState(IGameField maze, int totalGhosts, Point[] playerStarts, int pacmanIndex, Collection<Point> food, Collection<Point> pillets, Collection<T> possibleActions) {
         myMaze = maze;
         this.totalGhosts = totalGhosts;
-        this.playerStarts = new ArrayList<>(Arrays.asList(playerStarts));
+        this.playerStarts = new ArrayList<Point>(Arrays.asList(playerStarts));
         this.pacmanId = pacmanIndex;
         gameFieldActions = new HashSet(possibleActions);
         scoreCounter = new ScoreCounter();
-        foodLocation = new HashSet<>(food);
-        pilletsLocation = new HashSet<>(pillets);
+        foodLocation = new HashSet<Point>(food);
+        pilletsLocation = new HashSet<Point>(pillets);
         
-        isGhostConfused = new HashMap<>();
+        isGhostConfused = new HashMap<Integer, Boolean>();
         for (int id = 0; id < (totalGhosts + 1); id++) {
             if (id != pacmanIndex) {
                 isGhostConfused.put(id, Boolean.FALSE);
             }
         }
 
-        playersLocation = new HashMap<>();
+        playersLocation = new HashMap<Integer, Point>();
         for (int id = 0; id < (totalGhosts + 1); id++) {
             playersLocation.put(id, playerStarts[id]);
         }
@@ -105,14 +105,14 @@ public class GameState<T extends IAction> implements IExtendedState<T> {
     public GameState(GameState prototype) {
         this.myMaze = prototype.myMaze;
         this.totalGhosts = prototype.totalGhosts;
-        this.playerStarts = new ArrayList<>(prototype.playerStarts);
+        this.playerStarts = new ArrayList<Point>(prototype.playerStarts);
         this.pacmanId = prototype.pacmanId;
-        this.gameFieldActions = new HashSet<>(prototype.gameFieldActions);
+        this.gameFieldActions = new HashSet<T>(prototype.gameFieldActions);
         this.scoreCounter = new ScoreCounter(prototype.scoreCounter);
-        this.foodLocation = new HashSet<>(prototype.foodLocation);
-        this.pilletsLocation = new HashSet<>(prototype.pilletsLocation);
-        this.playersLocation = new HashMap<>(prototype.playersLocation);
-        this.isGhostConfused = new HashMap<>(prototype.isGhostConfused);
+        this.foodLocation = new HashSet<Point>(prototype.foodLocation);
+        this.pilletsLocation = new HashSet<Point>(prototype.pilletsLocation);
+        this.playersLocation = new HashMap<Integer, Point>(prototype.playersLocation);
+        this.isGhostConfused = new HashMap<Integer, Boolean>(prototype.isGhostConfused);
         this.actionsTillConfusionEnd = prototype.actionsTillConfusionEnd;
         this.gameWon = prototype.gameWon;
         this.gameLost = prototype.gameLost;
@@ -228,7 +228,7 @@ public class GameState<T extends IAction> implements IExtendedState<T> {
         private float getWeightedDistanceToNearestFood(int weight) {//<editor-fold defaultstate="collapsed">
             float funcNearestFood = 0;
             
-            ArrayList<Integer> distance = new ArrayList<>();
+            ArrayList<Integer> distance = new ArrayList<Integer>();
             for (Point food : foodLocation) {
                 distance.add(getManhattanDistance(getPlayerLocation(pacmanId), food));
             }
@@ -269,7 +269,7 @@ public class GameState<T extends IAction> implements IExtendedState<T> {
         private float getWeightedDistanceToNearestConfused(int weight) {//<editor-fold defaultstate="collapsed">
             float funcNearestConfused = 0;
             
-            TreeSet<Integer> distance = new TreeSet<>();
+            TreeSet<Integer> distance = new TreeSet<Integer>();
             for (int ghostId : playersLocation.keySet()) {
                 if (ghostId != pacmanId) {
                     if (isGhostConfused.get(ghostId) == Boolean.TRUE) {
@@ -468,7 +468,7 @@ public class GameState<T extends IAction> implements IExtendedState<T> {
 
     @Override
     public List<T> getLegalActions(int playerId) {
-        List<T> actions = new ArrayList<>();
+        List<T> actions = new ArrayList<T>();
         Point place = getPlayerLocation(playerId);
         for (T action : gameFieldActions) {
             Point destination = action.getLocationAfterAction(place);
@@ -491,7 +491,7 @@ public class GameState<T extends IAction> implements IExtendedState<T> {
 
     @Override
     public LinkedHashMap<Point, T> getLegalActionsAsMap(Point place) {
-        LinkedHashMap<Point, T> s = new LinkedHashMap<>();
+        LinkedHashMap<Point, T> s = new LinkedHashMap<Point, T>();
         for (T action : gameFieldActions) {
             Point destination = action.getLocationAfterAction(place);
             if (myMaze.isCellMovable(destination)) {
@@ -503,7 +503,7 @@ public class GameState<T extends IAction> implements IExtendedState<T> {
 
     @Override
     public LinkedHashMap<Point, T> getLegalActionsAsMapNoKins(Point place, int playerId) {
-        LinkedHashMap<Point, T> s = new LinkedHashMap<>();
+        LinkedHashMap<Point, T> s = new LinkedHashMap<Point, T>();
         for (T action : gameFieldActions) {
             Point destination = action.getLocationAfterAction(place);
             if (isDestinationMovable(destination)) {
@@ -527,7 +527,7 @@ public class GameState<T extends IAction> implements IExtendedState<T> {
      * @return <code>true</code>, если в клетке нет ни одного привидения
      */
     private boolean isOccupiedByGhosts(Point location) {
-        ArrayList<Point> ghostsLocations = new ArrayList<>();
+        ArrayList<Point> ghostsLocations = new ArrayList<Point>();
         for (int playerId : playersLocation.keySet()) {
             if (playerId != pacmanId) {
                 ghostsLocations.add(playersLocation.get(playerId));

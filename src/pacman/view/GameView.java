@@ -43,8 +43,8 @@ public class GameView extends JPanel implements Observer {
 
     private IAnimatedGameModel myModel;
     private int mazeCellSize;
-    private final TreeMap<PlayerType, AbstractPlayerFigure> playersView = new TreeMap<>();
-    private final Map<CellContent, IDrawableContent> cellsView = new LinkedHashMap<>();
+    private final TreeMap<PlayerType, AbstractPlayerFigure> playersView = new TreeMap<PlayerType, AbstractPlayerFigure>();
+    private final Map<CellContent, IDrawableContent> cellsView = new LinkedHashMap<CellContent, IDrawableContent>();
     private GameController myController;
 
     /**
