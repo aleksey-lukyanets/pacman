@@ -31,6 +31,14 @@ public interface IControlableGameModel {
      * @param ghostsNumber количество привидений в игре
      */
     public void setGhostsNumber(int ghostsNumber);
+
+    /**
+     * Возвращает <code>true</code>, если Пакманом выполнил все переданные ему
+     * действия.
+     *
+     * @return <code>true</code>, если Пакманом выполнил все свои действия
+     */
+    public boolean isPacmanQueueEmpty();
     
     /**
      * Запрашивает выполнение очередного действия Пакманом.

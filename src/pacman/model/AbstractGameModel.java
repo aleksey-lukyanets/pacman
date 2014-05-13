@@ -38,7 +38,6 @@ public abstract class AbstractGameModel
     protected int totalGhosts = 1;
     
     private final List<Point> locationsPool = new ArrayList<Point>();
-    private boolean pacmanActionsDone = true;
     private boolean redrawRequired = false;
 
     /**
@@ -78,9 +77,7 @@ public abstract class AbstractGameModel
      * Уведомляет об исполнении Пакманом всех действий.
      */
     protected void setPacmanActionsDone() {
-        this.pacmanActionsDone = true;
         reportChanged();
-        this.pacmanActionsDone = false;
     }
 
     //------------------------------------------------- Переопределяемые методы
@@ -94,6 +91,9 @@ public abstract class AbstractGameModel
     
     @Override
     public abstract void performPacmanAction(ISearchAlgorithm algorithm, Point goal);
+    
+    @Override
+    public abstract boolean isPacmanQueueEmpty();
     
     //----------------------------- Реализация интерфейса IControlableGameModel
 
@@ -118,11 +118,6 @@ public abstract class AbstractGameModel
     @Override
     public Point getCellAddress(Point coordinate) {
         return new Point(coordinate.x / getMazeCellSize(), coordinate.y / getMazeCellSize());
-    }
-    
-    @Override
-    public boolean isPacmanQueueEmpty() {
-        return pacmanActionsDone;
     }
     
     //------------------------------------ Реализация интерфейса IAnimatedGameModel
@@ -167,9 +162,6 @@ public abstract class AbstractGameModel
         return NonstopAction.getCorners();
     }
 
-    /**
-     * @return the redrawRequired
-     */
     @Override
     public boolean isRedrawRequired() {
         return redrawRequired;

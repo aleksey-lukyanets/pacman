@@ -183,8 +183,6 @@ public class GameModelImp extends TurnDrivenGameModel {
         ActionAnimator a = animators.get(playerId);
         a.setAction(action);
         animationThreadService.execute(a);                              // Запустить анимацию
-
-        setPlayerStatusMoving(playerId);                                // Изменить статус
     }
 
     @Override

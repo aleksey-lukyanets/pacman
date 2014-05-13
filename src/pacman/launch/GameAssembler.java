@@ -52,10 +52,12 @@ public class GameAssembler {
         
         view = new GameView();
         view.setModel(model);
-        model.addObserver(view);
 
         controller = new GameController(model, view, frame, contentPane);
         view.setController(controller);
+        
+        model.addObserver(view);
+        model.addObserver(controller);
     }
 
     /**

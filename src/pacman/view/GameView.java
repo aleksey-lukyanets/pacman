@@ -95,9 +95,6 @@ public class GameView extends JPanel implements Observer {
         if (myModel.isRedrawRequired()) {
             repaint();
         }
-        if (myModel.isPacmanQueueEmpty()) {
-            myController.performPacmanQueueEmpty();
-        }
     }
     
     //------------------------------------------------------- Функции рисования

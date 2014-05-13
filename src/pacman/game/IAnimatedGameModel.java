@@ -67,14 +67,6 @@ public interface IAnimatedGameModel {
      * @return итератор по углам клетки игрового поля
      */
     public List<IAction[]> getCorners();
-
-    /**
-     * Возвращает <code>true</code>, если Пакманом выполнил все переданные ему
-     * действия.
-     *
-     * @return <code>true</code>, если Пакманом выполнил все свои действия
-     */
-    public boolean isPacmanQueueEmpty();
     
     /**
      * Возвращает <code>true</code>, если есть необходимость перерисовки вида.

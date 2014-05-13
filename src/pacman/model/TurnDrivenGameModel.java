@@ -4,10 +4,9 @@ import algorithms.core.ISearchAlgorithm;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
 import pacman.game.IAction;
 
@@ -25,8 +24,7 @@ import pacman.game.IAction;
  * Реализация:<ol>
  * <li> Инициализировать список игроков в {@link initializePlayers};
  * <li> Возвращать идентификатор Пакмана в {@link getPacmanId};
- * <li> Изменять статус хода игрока через {@link setPlayerStatusMoving} и
- * {@link setPlayerStatusDone};
+ * <li> Изменять статус хода игрока через {@link setPlayerStatusDone};
  * <li> Расчитывать последовательность действий Пакмана через заданный алгоритм
  * в {@link getPacmanActionsSequence};
  * <li> Исполнять действия игроков в {@link startPlayerAction};
@@ -37,13 +35,12 @@ public abstract class TurnDrivenGameModel
         extends AbstractGameModel
         implements Runnable {
     
-    // Статус хода игрока
-    private final Map<Integer, PlayerStatus> playerActionStatus = new ConcurrentHashMap<Integer, PlayerStatus>();
-    
     // Очередь действий Пакмана
     private final BlockingQueue<IAction> pacmanActionsQueue = new LinkedBlockingQueue<IAction>();
     private final List<Integer> playersId = new ArrayList<Integer>();
+    
     private TurnStatus turnStatus = TurnStatus.PACMAN_ACTION;
+    private CountDownLatch finish;
     
     /**
      * Создаёт новую модель игры.
@@ -53,11 +50,6 @@ public abstract class TurnDrivenGameModel
     public TurnDrivenGameModel(GameFieldMap gameField) {
         super(gameField);
     }
-
-    /**
-     * Статус исполнения хода игроком.
-     */
-    private enum PlayerStatus {WAITING, MOVING, DONE};
     
     /**
      * Фаза выполнения тура игры.
@@ -82,9 +74,8 @@ public abstract class TurnDrivenGameModel
         for (int i = 0; i < (totalGhosts + 1); i++) {
             playersId.add(i);
         }
-        playerActionStatus.clear();
         pacmanActionsQueue.clear();
-        turnStatus = TurnStatus.NOBODY_ACTED;
+        turnStatus = TurnStatus.PACMAN_ACTION;
         clearActionsComplete();
     }
 
@@ -112,15 +103,9 @@ public abstract class TurnDrivenGameModel
         }
     }
     
-    /**
-     * Устанавливает состояние игрока в "передвигается".
-     * <p>
-     * Потоково-безопасен. Должен вызываться последним действием метода.
-     * 
-     * @param playerId идентификатор игрока
-     */
-    protected void setPlayerStatusMoving(int playerId) {
-        setPlayerActionStatus(playerId, PlayerStatus.MOVING);
+    @Override
+    public boolean isPacmanQueueEmpty() {
+        return pacmanActionsQueue.isEmpty();
     }
     
     /**
@@ -131,19 +116,8 @@ public abstract class TurnDrivenGameModel
      * @param playerId идентификатор игрока
      */
     protected void setPlayerStatusDone(int playerId) {
-        setPlayerActionStatus(playerId, PlayerStatus.DONE);
-    }
-    
-    /**
-     * Устанавливает статус исполнения хода игроком.
-     * @param playerId идентификатор игрока
-     * @param newStatus статус исполнения хода игроком
-     */
-    private void setPlayerActionStatus(int playerId, PlayerStatus newStatus) {
-        synchronized (playerActionStatus) {
-            playerActionStatus.put(playerId, newStatus);
-            playerActionStatus.notify();
-        }
+        //System.out.println("Прибыл игрок " + playerId);
+        finish.countDown();
     }
     
     @Override
@@ -154,33 +128,19 @@ public abstract class TurnDrivenGameModel
              */
             switch (turnStatus) {
                 
-                // Начало тура: ни один игрок не начинал передвижение
-                case NOBODY_ACTED:
-                {
-                    synchronized (playerActionStatus) {
-                        // Ожидать, пока все игроки будут переведены в режим ожидания
-                        while (!isEverybodyWaiting()) {
-                            try {
-                                playerActionStatus.wait();
-                            } catch (InterruptedException ie) {
-                            }
-                        }
-                    }
-                    turnStatus = TurnStatus.PACMAN_ACTION;
-                }
-                break;
-                
                 // Запуск хода Пакмана с последующими ходами привидений
                 case PACMAN_ACTION:
                 {
                     if (pacmanActionsQueue.isEmpty()) {
-                        setPacmanActionsDone();                     // Запросить новые ходы Пакмана
+                        setPacmanActionsDone();                                 // Запросить новые ходы Пакмана
                     }
+                    
                     try {
                         IAction action = pacmanActionsQueue.take();
-                        startPlayerAction(getPacmanId(), action); // Запуск хода Пакмана
-                    } catch (InterruptedException ie) {
-                    }
+                        //System.out.println("==========\nНовый тур");
+                        startPlayerAction(getPacmanId(), action);               // Запуск хода Пакмана
+                    } catch (InterruptedException ie) {}
+                    
                     letGhostsAct();                                             // Расчёт и запуск ходов привидений
                     turnStatus = TurnStatus.EVERYBODY_ACTED;
                 }
@@ -190,18 +150,15 @@ public abstract class TurnDrivenGameModel
                 case EVERYBODY_ACTED:
                 {
                     // Ожидать, пока все игроки завершат ходы
-                    synchronized (playerActionStatus) {
-                        while (!isEverybodyActingDone()) {
-                            try {
-                                playerActionStatus.wait();
-                            } catch (InterruptedException ie) {
-                            }
-                        }
-                    }
+                    try {
+                        finish.await();
+                        //System.out.println("Тур завершён");
+                    } catch (InterruptedException ie) {}
+                    
                     performTurnFinished();                                      // Завершить тур
                     reportChanged();                                            // Уведомить об изменении данных модели
                     clearActionsComplete();                                     // Перевести игроков в режим ожидания
-                    turnStatus = TurnStatus.NOBODY_ACTED;
+                    turnStatus = TurnStatus.PACMAN_ACTION;
                 }
                 break;
             }
@@ -215,37 +172,11 @@ public abstract class TurnDrivenGameModel
         //</editor-fold>
     }
 
-    private boolean isEverybodyActingDone() {
-        synchronized (playerActionStatus) {
-            for (int id : playersId) {
-                if (playerActionStatus.get(id) != PlayerStatus.DONE) {
-                    return false;
-                }
-            }
-            return true;
-        }
-    }
-
-    private boolean isEverybodyWaiting() {
-        synchronized (playerActionStatus) {
-            for (int id : playersId) {
-                if (playerActionStatus.get(id) != PlayerStatus.WAITING) {
-                    return false;
-                }
-            }
-            return true;
-        }
-    }
-
     /**
      * Очистить все флаги завершения ходов игроками в текущем туре игры.
      */
     private void clearActionsComplete() {
-        synchronized (playerActionStatus) {
-            for (int playerId : playersId) {
-                setPlayerActionStatus(playerId, PlayerStatus.WAITING);
-            }
-        }
+        finish = new CountDownLatch(playersId.size());
     }
     
     //----------------------------------------- Реализация передвижения игроков
@@ -261,11 +192,6 @@ public abstract class TurnDrivenGameModel
     
     /**
      * Запускает выполнение хода игроком.
-     * 
-     * После успешного запуска выполнения хода статус хода игрока должен быть
-     * установлен в значение {@link PlayerStatus.MOVING} функцией
-     * {@link setPlayerActionStatus}. В остальных случаях должен быть установлен
-     * статус хода {@link PlayerStatus.DONE}.
      * 
      * @param playerId идентификатор игрока
      * @param action ход игрока

@@ -7,6 +7,8 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -23,7 +25,7 @@ import pacman.view.GameView;
  * Пакманом имевшейся у него очереди действий, передаёт в игру алгоритм
  * получения новой очереди действий.</ol>
  */
-public class GameController {
+public class GameController implements Observer {
 
     private final IControlableGameModel myModel;            // Модель игры
     private final JPanel myView;                            // Графическое представление игры (панель)
@@ -52,21 +54,22 @@ public class GameController {
         optionsPanel = new OptionsPanel(this);
         pacmanControlMode = PacmanMode.AUTO_THINK_MUCH;
         pacmanBfs = new BreadthFirstSearch<IAction>();
-        modelThreadService
-                = Executors.newSingleThreadExecutor(new ThreadFactory() {
+        
+        modelThreadService = Executors.newSingleThreadExecutor(new ThreadFactory() {
             @Override
             public Thread newThread(Runnable r) {
                 Thread t = new Thread(r, "game model thread");
                 return t;
             }});
+        
         startGame();
     }
     
     /**
      * Способ управления Пакманом.
      */
-    public enum PacmanMode {
-    //<editor-fold defaultstate="collapsed">
+    public enum PacmanMode {//<editor-fold defaultstate="collapsed">
+    
         /**
          * Ручное управление кликом мыши.
          */
@@ -100,6 +103,13 @@ public class GameController {
             return autoTurnStart;
         }
     //</editor-fold>
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        if (myModel.isPacmanQueueEmpty()) {
+            performPacmanQueueEmpty();
+        }
     }
 
     //----------------------------------------------------- Методы запуска игры
