@@ -52,7 +52,7 @@ public class GameController implements Observer {
         myFrame = frame;
 
         optionsPanel = new OptionsPanel(this);
-        pacmanControlMode = PacmanMode.AUTO_THINK_MUCH;
+        pacmanControlMode = PacmanMode.AUTO_THINK_LESS;
         pacmanBfs = new BreadthFirstSearch<IAction>();
         
         modelThreadService = Executors.newSingleThreadExecutor(new ThreadFactory() {
