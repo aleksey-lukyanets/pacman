@@ -9,7 +9,11 @@
 
 <h2>How to</h2>
 
-<p>Run the application via command <code>./gradlew run</code> from the project directory.</p>
+<p>Run the application, from the project directory:</p>
+<ul>
+<li>run command <code>./gradlew run</code></li>
+<li>or build the project via <code>./gradlew build</code> and run its <code>/build/lib/pacman.jar</code></li>
+</ul>
 
 <br/>
 
